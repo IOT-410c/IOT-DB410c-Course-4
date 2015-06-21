@@ -84,7 +84,8 @@ public class VoipActivity extends Activity {
         status = (TextView) findViewById(R.id.textView);
 
         // Determines if the device is capable of VOIP
-        if (SipManager.isVoipSupported(getApplicationContext())) {
+        if (SipManager.isVoipSupported(getApplicationContext()) &&
+                SipManager.isApiSupported(getApplicationContext())) {
             // Set up Intent filter to receive calls
             IntentFilter filter = new IntentFilter();
             filter.addAction("android.SipDemo.INCOMING_CALL");
