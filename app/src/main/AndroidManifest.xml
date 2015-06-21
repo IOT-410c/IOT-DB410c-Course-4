@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="calit2.voipdemo" >
+
+    <!-- Defines a BroadcastReceiver Subclass to enable incoming calls-->
+    <receiver android:name=".IncomingCallReceiver" android:label="Call Receiver"/>
+
+    <!-- Declares necessary permissions for the app to work -->
+    <uses-permission android:name="android.permission.USE_SIP" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Declares necessary features for the app to work -->
+    <uses-feature android:name="android.hardware.sip.voip" android:required="true" />
+    <uses-feature android:name="android.hardware.wifi" android:required="true" />
+    <uses-feature android:name="android.hardware.microphone" android:required="true" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name=".VoipActivity"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
