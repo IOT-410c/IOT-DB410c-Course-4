@@ -3,11 +3,15 @@
     package="calit2.voipdemo" >
 
     <!-- Defines a BroadcastReceiver Subclass to enable incoming calls-->
-    <receiver android:name=".IncomingCallReceiver" android:label="Call Receiver"/>
+    <receiver android:name=".IncomingReceiver" android:label="Call Receiver"/>
 
     <!-- Declares necessary permissions for the app to work -->
     <uses-permission android:name="android.permission.USE_SIP" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <!-- Declares necessary features for the app to work -->
     <uses-feature android:name="android.hardware.sip.voip" android:required="true" />
