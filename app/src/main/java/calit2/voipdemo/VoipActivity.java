@@ -18,6 +18,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import java.text.ParseException;
 
@@ -34,6 +35,7 @@ public class VoipActivity extends Activity {
     private SipProfile profile = null;
     public SipAudioCall call = null;
     private TextView status;
+    private EditText mEdit;
 
     /**
      * Name: onCreate
@@ -51,7 +53,6 @@ public class VoipActivity extends Activity {
         // Attaches the view's button onto the private
         Button button = (Button) findViewById(R.id.button);
         status = (TextView) findViewById(R.id.textView);
-
         // Determines if the device is capable of VOIP
         if (SipManager.isVoipSupported(getApplicationContext()) &&
                 SipManager.isApiSupported(getApplicationContext())) {
@@ -61,6 +62,11 @@ public class VoipActivity extends Activity {
 
             // Creates the User's Sip Profile
             makeSipProfile();
+
+            Log.d("Test", mEdit.getText().toString());
+
+
+
 
             // Listener object to handle SIP functions
             final SipAudioCall.Listener listener =
@@ -119,8 +125,10 @@ public class VoipActivity extends Activity {
                     if (call == null) {
                         try {
                             call = manager.makeAudioCall(profile.getUriString(),
-                                    "sip:voip_demo2@sip.linphone.org", listener,
+                                    "sip:" + mEdit.getText().toString()+"@sip.linphone.org", listener,
                                     30);
+
+                            /*voip_demo2*/
                             status.setText("Call Made");
                             Log.e("$$", "Call went through");
                         } catch (SipException e) {
