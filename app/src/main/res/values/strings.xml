@@ -1,6 +1,10 @@
 <resources>
     <string name="app_name">VOIPDemo</string>
-
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+
+    <string name="make_call">Make Call</string>
+    <string name="end_call">End Call</string>
+    <string name="make_call_hint">Who to call?</string>
+    <string name="athr">Enter authorization code:</string>
+
 </resources>

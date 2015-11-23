@@ -10,36 +10,62 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Call"
-        android:id="@+id/button"
-        android:layout_centerVertical="true"
+        android:text="@string/make_call"
+        android:id="@+id/makeCall"
+        android:layout_gravity="center_vertical"
+        android:layout_marginBottom="10dp"
+        android:layout_above="@+id/textView"
         android:layout_centerHorizontal="true"
-        android:layout_gravity="center_vertical" />
+        android:background="#00FF00" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/end_call"
+        android:id="@+id/endCall"
+        android:layout_gravity="center_vertical"
+        android:layout_marginBottom="10dp"
+        android:layout_above="@+id/textView"
+        android:layout_centerHorizontal="true"
+        android:background="#FF0000"
+        android:visibility="invisible"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text=""
         android:id="@+id/textView"
-        android:layout_above="@+id/button"
-        android:layout_centerVertical="true"
+        android:layout_marginBottom="106dp"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/editText"
-        android:layout_below="@+id/button"
-        android:layout_alignRight="@+id/button"
-        android:layout_alignEnd="@+id/button"
-        android:layout_marginTop="36dp" />
+        android:id="@+id/adrToCall"
+        android:hint="@string/make_call_hint"
+        android:layout_above="@+id/makeCall"
+        android:layout_centerHorizontal="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/athr"
+        android:id="@+id/athr"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/VOIP_Username"
-        android:layout_alignBottom="@+id/editText"
-        android:layout_centerHorizontal="true"
-        android:text="Username" />
+        android:inputType="textPassword"
+        android:ems="10"
+        android:id="@+id/passcode"
+        android:background="@drawable/blk_rectangle"
+        android:gravity="center_horizontal"
+        android:layout_below="@+id/athr"
+        android:layout_centerHorizontal="true" />
+
 
 </RelativeLayout>

@@ -26,16 +26,23 @@ import java.text.ParseException;
  * Name: VoipActivity
  * Description: Enables an App to App calling between two phones
  */
-public class VoipActivity extends Activity {
+public class VoipActivity extends Activity implements View.OnClickListener {
 
+    private final String KEY = "password";
     private static final String USERNAME = "mooc_sip";
     private static final String DOMAIN = "sip.linphone.org";
     private static final String PASSWORD = "password";
+
+    private SipAudioCall.Listener listener;
+
     public SipManager manager = null;
     private SipProfile profile = null;
     public SipAudioCall call = null;
+
+
     private TextView status;
-    private EditText mEdit;
+    private EditText adrToCall, authorization;
+    private Button makeCallBtn, endCallBtn;
 
     /**
      * Name: onCreate
@@ -51,8 +58,14 @@ public class VoipActivity extends Activity {
         setContentView(R.layout.voip);
 
         // Attaches the view's button onto the private
-        Button button = (Button) findViewById(R.id.button);
+        makeCallBtn = (Button) findViewById(R.id.makeCall);
+        endCallBtn = (Button) findViewById(R.id.endCall);
         status = (TextView) findViewById(R.id.textView);
+
+        // get address text and authorization fields
+        adrToCall = (EditText) findViewById(R.id.adrToCall);
+        authorization = (EditText) findViewById(R.id.passcode);
+
         // Determines if the device is capable of VOIP
         if (SipManager.isVoipSupported(getApplicationContext()) &&
                 SipManager.isApiSupported(getApplicationContext())) {
@@ -63,13 +76,13 @@ public class VoipActivity extends Activity {
             // Creates the User's Sip Profile
             makeSipProfile();
 
-            Log.d("Test", mEdit.getText().toString());
+            Log.d("Test", adrToCall.getText().toString());
 
 
 
 
             // Listener object to handle SIP functions
-            final SipAudioCall.Listener listener =
+            listener =
                     new SipAudioCall.Listener() {
 
                         /**
@@ -112,39 +125,65 @@ public class VoipActivity extends Activity {
             this.registerReceiver(receiver, filter);
 
             // Creates a listener for the button
-            button.setOnClickListener(new View.OnClickListener() {
-
-                /**
-                 * Name: onClick
-                 * Description: onClick determines what action the button
-                 *              performs when clicked by the user.
-                 */
-                @Override
-                public void onClick(View view) {
-                    // Make a Call
-                    if (call == null) {
-                        try {
-                            call = manager.makeAudioCall(profile.getUriString(),
-                                    "sip:" + mEdit.getText().toString()+"@sip.linphone.org", listener,
-                                    30);
-
-                            /*voip_demo2*/
-                            status.setText("Call Made");
-                            Log.e("$$", "Call went through");
-                        } catch (SipException e) {
-                            Log.e("$$", "Call failed. Error message: " + e);
-                        }
-                    } else { // Hang up
-                        try {
-                            call.endCall();
-                        } catch (SipException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            });
+            makeCallBtn.setOnClickListener(this);
+            endCallBtn.setOnClickListener(this);
         } else {
             status.setText("Your device does not support VOIP");
+        }
+    }
+
+    public void onClick(View v)
+    {
+        if (v.getId() == R.id.makeCall) {
+            // check if you are authorized to call
+            if (!(authorization.getText().toString().equals(KEY))) { // if not equal
+                status.setText("INCORRECT AUTHORIZATION CODE");
+                return;
+            }
+
+            // check for an address
+            if (adrToCall.getText().toString().isEmpty()) { // if nothing; ask to input something
+                status.setText("Please tell me who to call");
+                return;
+            }
+
+            // Make a Call
+            if (call == null) {
+                try {
+                    call = manager.makeAudioCall(profile.getUriString(),
+                            "sip:" + adrToCall.getText().toString() + "@sip.linphone.org", listener,
+                            30);
+
+                            /*voip_demo2*/
+                    status.setText("Call Made");
+                    Log.e("$$", "Call went through");
+
+                    makeCallBtn.setVisibility(View.INVISIBLE);
+                    endCallBtn.setVisibility(View.VISIBLE);
+                } catch (SipException e) {
+                    status.setText("Call Failed");
+                    Log.e("$$", "Call failed. Error message: " + e);
+                }
+            } else { // Hang up
+                try {
+                    call.endCall();
+                    call = null;
+                } catch (SipException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        else { // if v.getId() == R.id.endCall
+            try {
+                call.endCall();
+                call = null;
+
+                status.setText("Call Ended");
+                endCallBtn.setVisibility(View.INVISIBLE);
+                makeCallBtn.setVisibility(View.VISIBLE);
+            } catch (SipException e) {
+                e.printStackTrace();
+            }
         }
     }
 
