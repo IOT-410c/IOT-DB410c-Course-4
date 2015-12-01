@@ -14,7 +14,9 @@ import android.net.sip.SipException;
 import android.net.sip.SipManager;
 import android.net.sip.SipProfile;
 import android.net.sip.SipRegistrationListener;
+import android.net.sip.SipSession;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -26,18 +28,17 @@ import java.text.ParseException;
  * Name: VoipActivity
  * Description: Enables an App to App calling between two phones
  */
-public class VoipActivity extends Activity implements View.OnClickListener {
+public class VoipActivity extends Activity implements View.OnClickListener, DialogInterface.OnClickListener {
 
-    private final String KEY = "password";
-    private static final String USERNAME = "mooc_sip";
-    private static final String DOMAIN = "sip.linphone.org";
-    private static final String PASSWORD = "password";
-
-    private SipAudioCall.Listener listener;
+    private final String KEY = "";
+    private final String USERNAME = "mooc_sip";
+    private final String DOMAIN = "sip.linphone.org";
+    private final String PASSWORD = "password";
 
     public SipManager manager = null;
     private SipProfile profile = null;
     public SipAudioCall call = null;
+    public SipAudioCall incCall = null;
 
 
     private TextView status;
@@ -78,45 +79,46 @@ public class VoipActivity extends Activity implements View.OnClickListener {
 
             Log.d("Test", adrToCall.getText().toString());
 
-
-
+            call = new SipAudioCall(getApplicationContext(), profile); // set up your calling profile
 
             // Listener object to handle SIP functions
-            listener =
-                    new SipAudioCall.Listener() {
+            SipAudioCall.Listener listener = new SipAudioCall.Listener() {
 
-                        /**
-                         * Name: onCallEstablished
-                         * Description: onCallEstablished is called when the
-                         *              user establishes a call. This method
-                         *              will enable the User to talk to the
-                         *              person on the opposite line.
-                         */
-                        @Override
-                        public void onCallEstablished(SipAudioCall call) {
-                            call.startAudio();
-                            call.setSpeakerMode(true);
+                /**
+                 * Name: onCallEstablished
+                 * Description: onCallEstablished is called when the
+                 *              user establishes a call. This method
+                 *              will enable the User to talk to the
+                 *              person on the opposite line.
+                 */
+                @Override
+                public void onCallEstablished(SipAudioCall call) {
+                    super.onCallEstablished(call);
+                    call.startAudio();
+                    call.setSpeakerMode(true);
+                    Log.d("call", "Call established");
 
-                            if (call.isMuted()) {
-                                call.toggleMute();
-                            }
-                        }
+                    if (call.isMuted()) {
+                        call.toggleMute();
+                    }
+                }
 
-                        /**
-                         * Name: onCallEnded
-                         * Description: onCallEnded is called when the user ends the
-                         *              call.
-                         */
-                        @Override
-                        public void onCallEnded(SipAudioCall endedCall) {
-                            try {
-                                call = null;
-                                endedCall.endCall();
-                            } catch (SipException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    };
+                /**
+                 * Name: onCallEnded
+                 * Description: onCallEnded is called when the call is ended
+                 */
+                @Override
+                public void onCallEnded(SipAudioCall endedCall) {
+                    super.onCallEnded(endedCall);
+                    Log.d("call", "Call ended");
+                    try {
+                        endedCall.endCall();
+                    } catch (SipException e) {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            call.setListener(listener);
 
             // Set up Intent filter to receive calls
             IntentFilter filter = new IntentFilter();
@@ -124,7 +126,7 @@ public class VoipActivity extends Activity implements View.OnClickListener {
             IncomingReceiver receiver = new IncomingReceiver();
             this.registerReceiver(receiver, filter);
 
-            // Creates a listener for the button
+            // Creates a listener for the buttons
             makeCallBtn.setOnClickListener(this);
             endCallBtn.setOnClickListener(this);
         } else {
@@ -148,42 +150,98 @@ public class VoipActivity extends Activity implements View.OnClickListener {
             }
 
             // Make a Call
-            if (call == null) {
-                try {
-                    call = manager.makeAudioCall(profile.getUriString(),
-                            "sip:" + adrToCall.getText().toString() + "@sip.linphone.org", listener,
-                            30);
+            status.setText("Call Made");
+            SipProfile.Builder builder;
+            SipProfile toCall;
+            try {
+                builder = new SipProfile.Builder(adrToCall.getText().toString(), DOMAIN);
+                toCall = builder.build();
+                SipSession.Listener ssl = new SipSession.Listener() {
+                    @Override
+                    public void onCallEnded(SipSession session) {
+                        super.onCallEnded(session);
+                        try {
+                            call.endCall();
+                        } catch (SipException e) {
+                            e.printStackTrace();
+                        }
+                        session.endCall();
+                    }
+                };
 
-                            /*voip_demo2*/
-                    status.setText("Call Made");
-                    Log.e("$$", "Call went through");
+                call.makeCall(toCall, manager.createSipSession(profile, ssl), 30);
 
-                    makeCallBtn.setVisibility(View.INVISIBLE);
-                    endCallBtn.setVisibility(View.VISIBLE);
-                } catch (SipException e) {
-                    status.setText("Call Failed");
-                    Log.e("$$", "Call failed. Error message: " + e);
-                }
-            } else { // Hang up
-                try {
-                    call.endCall();
-                    call = null;
-                } catch (SipException e) {
-                    e.printStackTrace();
-                }
+            } catch (SipException e) {
+                status.setText("Call failed: " + e.getMessage());
+                e.printStackTrace();
+            } catch (ParseException e) {
+                status.setText("Call failed: " + e.getMessage());
+                e.printStackTrace();
             }
         }
         else { // if v.getId() == R.id.endCall
+            status.setText("Call Ended");
             try {
                 call.endCall();
-                call = null;
-
-                status.setText("Call Ended");
-                endCallBtn.setVisibility(View.INVISIBLE);
-                makeCallBtn.setVisibility(View.VISIBLE);
             } catch (SipException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public void incomingCall(SipAudioCall c)
+    {
+        if (c == null)
+            return;
+
+        if (call.isInCall()) // if there is a call already, ignore new one
+            return;
+
+        if (incCall != null) // if there is an incoming call
+            return;
+
+        //else if call isn't null
+        Log.d("call", "Incoming call");
+        SipProfile caller = c.getPeerProfile();
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                        builder.setTitle("Incoming call from:")
+                                .setMessage(caller.getUriString())
+                                .setPositiveButton("Accept", this)
+                                .setNegativeButton("Decline", this);
+        builder.show();
+
+    }
+
+    /**
+     *
+     * @param which -1 = accept button, -2 = decline button
+     */
+    @Override
+    public void onClick(DialogInterface dialog, int which)
+    {
+        if (which == -1) {
+            try {
+                incCall.answerCall(30);
+                incCall.startAudio();
+                incCall.setSpeakerMode(true);
+
+                if(incCall.isMuted()) {
+                    incCall.toggleMute();
+                }
+            } catch (SipException e) {
+                e.printStackTrace();
+            }
+        }
+        else if (which == -2) { // decline the call
+            status.setText("Incoming Call Declined");
+            try {
+                incCall.endCall();
+            } catch (SipException e) {
+                e.printStackTrace();
+            }
+            incCall.close();
+            incCall = null;
         }
     }
 
@@ -217,8 +275,7 @@ public class VoipActivity extends Activity implements View.OnClickListener {
                 // Creates an intent to receive calls
                 Intent intent = new Intent();
                 intent.setAction("android.VOIPDEMO.INCOMING_CALL");
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(this,
-                        0, intent, Intent.FILL_IN_DATA);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, Intent.FILL_IN_DATA);
                 manager.open(profile, pendingIntent, null);
 
                 // Determines if the SipProfile successfully registered
@@ -239,8 +296,7 @@ public class VoipActivity extends Activity implements View.OnClickListener {
                          * Description: Logs a status message indicating the
                          *              SipProfile successfully registered.
                          */
-                        public void onRegistrationDone(String localProfileUri,
-                                                       long expiryTime) {
+                        public void onRegistrationDone(String localProfileUri, long expiryTime) {
                             Log.e("$$", "Sip Profile successfully registered");
                         }
 
@@ -249,9 +305,7 @@ public class VoipActivity extends Activity implements View.OnClickListener {
                          * Description: Logs a status message indicating the
                          *              SipProfile failed to register.
                          */
-                        public void onRegistrationFailed(String localProfileUri,
-                                                         int errorCode,
-                                                         String errorMessage) {
+                        public void onRegistrationFailed(String localProfileUri, int errorCode, String errorMessage) {
                             Log.e("$$", "Sip Profile failed to register." +
                                     " Error message: " + errorMessage);
                         }
@@ -263,6 +317,7 @@ public class VoipActivity extends Activity implements View.OnClickListener {
             }
         }
     }
+
 
     /**
      * Name: IncomingCallReceiver
@@ -277,11 +332,12 @@ public class VoipActivity extends Activity implements View.OnClickListener {
         @Override
         public void onReceive(Context context, Intent intent) {
             SipAudioCall incomingCall = null;
+
             try {
+
                 SipAudioCall.Listener listener = new SipAudioCall.Listener() {
                     @Override
-                    public void onRinging(SipAudioCall call,
-                                          SipProfile caller) {
+                    public void onRinging(SipAudioCall call, SipProfile caller) {
                         try {
                             call.answerCall(30);
                         } catch (Exception e) {
@@ -292,18 +348,12 @@ public class VoipActivity extends Activity implements View.OnClickListener {
 
                 VoipActivity wSIP = (VoipActivity) context;
                 incomingCall = wSIP.manager.takeAudioCall(intent, listener);
-                incomingCall.answerCall(30);
-                incomingCall.startAudio();
-                incomingCall.setSpeakerMode(true);
 
-                if(incomingCall.isMuted()) {
-                    incomingCall.toggleMute();
-                }
 
-//                wSIP.call = incomingCall;
-//                wSIP.updateStatus(incomingCall);
+                wSIP.incomingCall(incomingCall);
 
             } catch (Exception e) {
+                e.printStackTrace();
                 if (incomingCall != null) {
                     incomingCall.close();
                 }
@@ -311,15 +361,3 @@ public class VoipActivity extends Activity implements View.OnClickListener {
         }
     }
 }
-
-/*
-id = voip_demo
-pass = password
-domain = sip.linphone.org
-sip:voip_demo@sip.linphone.org
-
-id = voip_demo2
-pass = password
-domain = sip.linphone.org
-sip:voip_demo2@sip.linphone.org
- */

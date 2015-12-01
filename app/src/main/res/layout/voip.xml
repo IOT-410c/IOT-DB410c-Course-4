@@ -13,10 +13,10 @@
         android:text="@string/make_call"
         android:id="@+id/makeCall"
         android:layout_gravity="center_vertical"
-        android:layout_marginBottom="10dp"
+        android:background="#00FF00"
         android:layout_above="@+id/textView"
-        android:layout_centerHorizontal="true"
-        android:background="#00FF00" />
+        android:layout_alignLeft="@+id/passcode"
+        android:layout_alignStart="@+id/passcode" />
 
     <Button
         android:layout_width="wrap_content"
@@ -24,17 +24,17 @@
         android:text="@string/end_call"
         android:id="@+id/endCall"
         android:layout_gravity="center_vertical"
-        android:layout_marginBottom="10dp"
-        android:layout_above="@+id/textView"
-        android:layout_centerHorizontal="true"
         android:background="#FF0000"
-        android:visibility="invisible"/>
+        android:layout_below="@+id/adrToCall"
+        android:layout_alignRight="@+id/passcode"
+        android:layout_alignEnd="@+id/passcode" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text=""
         android:id="@+id/textView"
+        android:layout_marginTop="10dp"
         android:layout_marginBottom="106dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
@@ -45,7 +45,8 @@
         android:id="@+id/adrToCall"
         android:hint="@string/make_call_hint"
         android:layout_above="@+id/makeCall"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="15dp" />
 
     <TextView
         android:layout_width="wrap_content"
