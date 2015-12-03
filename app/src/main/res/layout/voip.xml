@@ -4,7 +4,7 @@
     android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".SIP"
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".VoipActivity"
     android:id="@+id/VOIP_username">
 
     <Button
@@ -45,8 +45,13 @@
         android:id="@+id/adrToCall"
         android:hint="@string/make_call_hint"
         android:layout_above="@+id/makeCall"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="15dp" />
+        android:layout_marginBottom="15dp"
+        android:layout_alignLeft="@+id/makeCall"
+        android:layout_alignStart="@+id/makeCall"
+        android:layout_alignRight="@+id/passcode"
+        android:layout_alignEnd="@+id/passcode"
+        android:layout_gravity="center_horizontal"
+        android:singleLine="true" />
 
     <TextView
         android:layout_width="wrap_content"
