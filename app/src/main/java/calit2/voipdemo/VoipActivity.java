@@ -31,9 +31,9 @@ import java.text.ParseException;
 public class VoipActivity extends Activity implements View.OnClickListener {
 
     private final String KEY = "password";
-    private final String USERNAME = "calit2_buddy";
+    private final String USERNAME = "mooc_sip";
     private final String DOMAIN = "sip.linphone.org";
-    private final String PASSWORD = "calit2";
+    private final String PASSWORD = "password";
 
     public SipManager manager = null;
     private SipProfile profile = null;

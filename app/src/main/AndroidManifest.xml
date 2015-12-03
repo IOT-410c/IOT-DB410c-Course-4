@@ -26,7 +26,8 @@
         android:screenOrientation="portrait" >
         <activity
             android:name=".VoipActivity"
-            android:label="@string/app_name" >
+            android:label="@string/app_name"
+            android:windowSoftInputMode="stateHidden" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
