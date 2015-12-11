@@ -1,5 +1,5 @@
 /******************************************************************************
- * Author: Jacob Terrado
+ * Authors: Jacob Terrado, Randy Tran
  * Date: 06/20/15
  * Company: Calit2
  *****************************************************************************/
@@ -30,10 +30,12 @@ import java.text.ParseException;
  */
 public class VoipActivity extends Activity implements View.OnClickListener {
 
-    private final String KEY = "password";
-    private final String USERNAME = "mooc_sip";
-    private final String DOMAIN = "sip.linphone.org";
-    private final String PASSWORD = "password";
+
+    /*  Be sure to fill in the information below before using this app!!    */
+    private final String KEY = "  ";        // for the AUTHORIZATION password
+    private final String USERNAME = "   ";  // your account's username
+    private final String DOMAIN = "  ";     // the domain name of your account
+    private final String PASSWORD = "  ";   // your account's password
 
     public SipManager manager = null;
     private SipProfile profile = null;
@@ -68,12 +70,11 @@ public class VoipActivity extends Activity implements View.OnClickListener {
         adrToCall = (EditText) findViewById(R.id.adrToCall);
         authorization = (EditText) findViewById(R.id.passcode);
 
-
-        make();
-
         // Creates a listener for the buttons
         makeCallBtn.setOnClickListener(this);
         endCallBtn.setOnClickListener(this);
+
+        make();
     }
 
     @Override
@@ -83,6 +84,9 @@ public class VoipActivity extends Activity implements View.OnClickListener {
         make();
     }
 
+    /**
+     * Used to create the local profile
+     */
     private void make()
     {
         // Determines if the device is capable of VOIP
@@ -166,6 +170,9 @@ public class VoipActivity extends Activity implements View.OnClickListener {
         closeAll();
     }
 
+    /**
+     * Closes any current calls and unregisters the receiver
+     */
     private void closeAll()
     {
         try { // try to close everything
@@ -180,10 +187,15 @@ public class VoipActivity extends Activity implements View.OnClickListener {
         }
     }
 
+    /**
+     * Set the status of the text
+     * @param message
+     */
     public static void setText(String message)
     {
         status.setText(message);
     }
+
 
     public void onClick(View v)
     {
